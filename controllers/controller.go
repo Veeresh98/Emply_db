@@ -26,7 +26,11 @@ func CreateEmployee(c *gin.Context) {
 	var employee models.Employee
 
 	if err := c.ShouldBindJSON(&employee); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while binding the json"})
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create employee"})
+
+		log.Println("Error creating employee:", err)
+
 		return
 	}
 
@@ -37,7 +41,7 @@ func CreateEmployee(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, createdEmployee)
+	c.JSON(http.StatusCreated, createdEmployee)
 
 }
 

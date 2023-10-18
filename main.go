@@ -18,7 +18,13 @@ func main() {
 	router.PUT("/employees/:id", controllers.UpdateEmployee)
 	router.DELETE("employees/:id", controllers.DeleteEmployee)
 
-	err := router.Run("8080")
+	router.ForwardedByClientIP = true
+	var err = router.SetTrustedProxies([]string{"192.168.1.100"})
+	if err != nil {
+		return
+	}
+
+	err = router.Run(":8080")
 	if err != nil {
 		return
 	}

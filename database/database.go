@@ -15,11 +15,12 @@ var (
 
 func InitializeMongodb() {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
 	if err != nil {
+		log.Println("Error initializing MongoDB client:", err)
 		return
 	}
 
@@ -33,4 +34,17 @@ func InitializeMongodb() {
 
 	log.Println("connected to mongodb")
 
+	checkDatabaseAndCollection()
+
+}
+
+func checkDatabaseAndCollection() {
+	db := MongoClient.Database("employee_db")
+	collectionName := "employees"
+
+	if err := db.CreateCollection(context.Background(), collectionName); err != nil {
+		if err.Error() != "namespace exists" {
+			log.Println("Error creating collection:", err)
+		}
+	}
 }

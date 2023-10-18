@@ -14,9 +14,22 @@ var (
 	EmployeeCollection *mongo.Collection
 )
 
-func init() {
-	EmployeeCollection = db.MongoClient.Database("employeeDatabase").Collection("employee")
-}
+//func init() {
+//
+//	if db.MongoClient == nil {
+//		log.Println("MongoDB client is not initialized. Check database.")
+//		return
+//	}
+//
+//	EmployeeCollection = db.MongoClient.Database("employeeDatabase").Collection("employee")
+//
+//	if EmployeeCollection == nil {
+//
+//		log.Println("Error: MongoDB connection is not connected correctly.")
+//	}
+//
+//	log.Println("EmployeeCollection initialized.")
+//}
 
 func GetAllEmployees() ([]models.Employee, error) {
 
@@ -45,10 +58,23 @@ func GetAllEmployees() ([]models.Employee, error) {
 
 func CreateEmployee(employee models.Employee) (models.Employee, error) {
 
+	if db.MongoClient == nil {
+		log.Println("MongoDB client is not initialized. Check database.")
+	}
+
+	EmployeeCollection = db.MongoClient.Database("employeeDatabase").Collection("employee")
+
+	if EmployeeCollection == nil {
+
+		log.Println("Error: MongoDB connection is not connected correctly.")
+	}
+
+	log.Println("EmployeeCollection initialized.")
+
 	result, err := EmployeeCollection.InsertOne(context.TODO(), employee)
 
 	if err != nil {
-		log.Println("error: error while inserting the employee to the database")
+		log.Println("error: error while inserting the employee to the database", err)
 		return models.Employee{}, err
 	}
 	employee.ID = result.InsertedID.(primitive.ObjectID)
